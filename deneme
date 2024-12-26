@@ -1,0 +1,146 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+#define TABLE_SIZE 128
+
+class Node{
+    public:
+        string key;
+        int value;
+        Node* next;
+    
+        Node(const string &k, int v) : key(k), value(v), next(nullptr){}
+
+};
+
+class HashTable{
+    private:
+        Node *table [TABLE_SIZE];
+
+        int hash(const string& key){
+            int hashValue = 0;
+            for(char ch : key){
+                hashValue = (hashValue * 31)+ ch;
+            }
+            return hashValue % TABLE_SIZE;
+        }
+
+    public:
+        HashTable(){
+            for(int i = 0; i < TABLE_SIZE; i++){
+                table[i] = nullptr;
+            }
+        }
+
+        ~HashTable(){
+            for(int i = 0; i< TABLE_SIZE; i++){
+                Node *head = table[i];
+                while(head){
+                    Node *temp = head;
+                    head = head->next;
+                    delete temp;
+                }
+            }
+        }
+
+        void insert(const string& key, int value){
+            int index = hash(key);
+            Node *newNode = new Node(key, value);
+            newNode->next = table[index];
+            table[index] = newNode;
+        }
+
+        int search(const string& key){
+            int index = hash(key);
+            Node *current = table[index];
+            while(current){
+                if(current->key == key){
+                    return current->value;
+                }
+                current = current->next;
+            }
+            return -1;
+        }
+
+        void display(){
+            for(int i = 0; i < TABLE_SIZE ; i++){
+                Node *current = table[i];
+                if(current){
+                    cout << "Bucket" << i << ":\n";
+                    while(current){
+                        cout <<" " << current -> key << " : " << current->value << endl;
+                        current = current->next;
+                    }
+                }
+            }
+        }
+};
+
+int main(){
+    HashTable ht;
+
+    ht.insert("John", 123);
+    ht.insert("Doe", 456);
+    ht.insert("Jane", 789);
+    ht.insert("Doe", 135);
+
+    ht.display();
+}
+
+
+
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTICES 5
+
+struct Graph {
+    int adjMatrix[MAX_VERTICES][MAX_VERTICES];
+    int numVertices;
+};
+
+void initGraph(struct Graph *g, int numVertices){
+    int i, j;
+    g->numVertices = numVertices;
+
+    for(i = 0; i < numVertices; i++){
+        for(j = 0; j < numVertices; j++){
+            g->adjMatrix[i][j] = 0;
+        }
+    }
+}
+
+void addEdge(struct Graph *g, int startVertex, int endVertex){
+    if(startVertex >= g->numVertices || endVertex >= g->numVertices || startVertex < 0 || endVertex < 0){
+        printf("Invalid vertex number.\n");
+        return;
+    } 
+
+    g->adjMatrix[startVertex][endVertex] = 1;
+    g->adjMatrix[endVertex][startVertex] = 1;    
+}
+
+void displayGraph(struct Graph *g){
+    int i,j;
+
+    printf("Adjacency Matrix:\n");
+    for(i = 0; i < g->numVertices; i++){
+        for(j = 0; j < g->numVertices; j++){
+            printf("%d ", g->adjMatrix[i][j]);
+        }
+        printf("\n");
+    }
+}
+
+
+int main(){
+    struct Graph g;
+
+    initGraph(&g, MAX_VERTICES);
+
+    addEdge(&g, 0, 1);
+
+    displayGraph(&g);
+}
